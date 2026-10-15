@@ -1,0 +1,16 @@
+.card-frame { display: flex; flex-direction: column; min-height: 650px; padding: 22px 28px 18px; }
+.card-topline { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: relative; z-index: 4; }
+.card-topline .wordmark--small { font-size: 26px; letter-spacing: -1.7px; color: var(--card-ink, var(--ink)); }
+.card-topline .wordmark--small span { color: currentColor; }
+.card-controls { display: flex; align-items: center; gap: 16px; position: relative; }
+.card-edition { color: var(--card-muted, #535a3c); font: 8px var(--mono); letter-spacing: .07em; }
+.card-bottomline { display: flex; align-items: center; gap: 14px; margin-top: 21px; color: var(--card-ink, var(--ink)); position: relative; z-index: 4; }
+.scene-counter { flex-shrink: 0; font: 9px var(--mono); }
+.scene-progress { display: flex; align-items: center; justify-content: center; gap: 4px; list-style: none; padding: 0; margin: 0; flex: 1; }
+.scene-progress li { flex: 1; height: 3px; background: currentColor; opacity: .18; }
+.scene-progress li.is-complete { opacity: .5; }
+.scene-progress li[aria-current='step'] { opacity: 1; }
+.card-signature { color: var(--card-muted, #535a3c); font: 8px var(--mono); min-width: 75px; text-align: right; }
+@media (max-width: 1000px) { .card-frame { padding: 20px 22px 18px; } .card-controls { gap: 10px; } }
+@media (max-width: 900px) and (min-width: 761px) { .card-edition { display: none; } .card-frame { padding-left: 19px; padding-right: 19px; } }
+@media (max-width: 400px) { .card-frame { padding: 19px 20px 17px; } .card-controls { gap: 9px; } .card-edition { font-size: 7px; } .card-signature { min-width: 65px; font-size: 7px; } .card-bottomline { gap: 10px; } }
