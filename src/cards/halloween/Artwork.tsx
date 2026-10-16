@@ -1,4 +1,4 @@
-import { useLocon } from 'locon/react';
+import { L } from 'locon/react';
 import { useId } from 'react';
 import type { HalloweenCharacter } from './model';
 
@@ -7,7 +7,6 @@ export function Bat({ className = '' }: { className?: string }) {
 }
 
 export function Invitation() {
-  const { l } = useLocon();
   return (
     <svg className="invitation-art" viewBox="0 0 640 330" fill="none" aria-hidden="true">
       <ellipse cx="326" cy="291" rx="158" ry="14" fill="#20231e" opacity=".13" />
@@ -16,9 +15,9 @@ export function Invitation() {
           <path d="M153 63h336v75a19 19 0 0 0 0 38v76H153v-76a19 19 0 0 0 0-38V63Z" fill="#242820" stroke="#242820" strokeWidth="3" transform="translate(9 10)" />
           <path d="M153 63h336v75a19 19 0 0 0 0 38v76H153v-76a19 19 0 0 0 0-38V63Z" fill="#fcf9e9" stroke="#242820" strokeWidth="3" />
           <path d="M409 65v184" stroke="#9b9e8d" strokeWidth="2" strokeDasharray="5 7" />
-          <text x="180" y="97" fill="#242820" fontSize="11" fontFamily="monospace" letterSpacing="3">{l('ticket.small')}</text>
-          <text x="177" y="154" fill="#242820" fontSize="49" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="-2">{l('ticket.line1')}</text>
-          <text x="177" y="204" fill="#fa6036" fontSize="49" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="-2">{l('ticket.line2')}</text>
+          <text x="180" y="97" fill="#242820" fontSize="11" fontFamily="monospace" letterSpacing="3"><L>EINMAL GÄNSEHAUT, BITTE.</L></text>
+          <text x="177" y="154" fill="#242820" fontSize="49" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="-2"><L>DU BIST</L></text>
+          <text x="177" y="204" fill="#fa6036" fontSize="49" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="-2"><L>DRAN.</L></text>
           <path d="M180 226h197" stroke="#242820" strokeWidth="2" />
           <text x="437" y="218" transform="rotate(-90 437 218)" fill="#242820" fontSize="19" fontWeight="800" fontFamily="monospace" letterSpacing="4">31 / 10</text>
           <path d="M462 91v124m5-124v124m6-124v124" stroke="#242820" strokeWidth="2" />

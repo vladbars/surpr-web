@@ -1,4 +1,4 @@
-import { useLocon } from 'locon/react';
+import { L, useLocon } from 'locon/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import gsap from 'gsap';
@@ -6,6 +6,7 @@ import { useGSAP } from '@gsap/react';
 import { CardFrame } from '../../components/CardFrame';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { BatSwarm, CandyRain, CharacterArt, HauntedDoor, Invitation } from './Artwork';
+import { characterNames } from './model';
 import type { HalloweenSurpriseProps } from './model';
 import { useHalloweenAudio } from './useHalloweenAudio';
 import './halloween.css';
@@ -13,6 +14,13 @@ import './halloween.css';
 gsap.registerPlugin(useGSAP);
 const scenes = ['intro', 'door', 'character', 'message', 'end'] as const;
 type Scene = (typeof scenes)[number];
+const sceneNames: Record<Scene, string> = {
+  intro: 'Die Einladung',
+  door: 'Die Tür',
+  character: 'Erwischt!',
+  message: 'Geheime Post',
+  end: 'Halloween',
+};
 
 function SpeakerIcon({ enabled }: { enabled: boolean }) {
   return <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4Z" />{enabled ? <><path d="M16 8q4 4 0 8m3-11q7 7 0 14" /></> : <path d="m17 9 5 6m0-6-5 6" />}</svg>;
@@ -102,48 +110,48 @@ export function HalloweenSurprise({ recipientName, message, character, previewMo
     gsap.timeline().to(monster, { scale: 1.13, rotation: -10, duration: 0.1 }).to(monster, { rotation: 9, duration: 0.1 }).to(monster, { scale: 1, rotation: 0, duration: 0.65, ease: 'elastic.out(1, 0.4)' });
   });
 
-  const controls = <><button type="button" className="sound-toggle" onClick={() => void sound.toggle()} aria-label={l(sound.enabled ? 'audio.offAria' : 'audio.onAria')} aria-pressed={sound.enabled} aria-busy={sound.pending}><SpeakerIcon enabled={sound.enabled} /><span>{l(sound.enabled ? 'audio.on' : 'audio.off')}</span></button>{sound.unavailable && <span className="sound-status" role="status">{l('audio.unavailable')}</span>}</>;
+  const controls = <><button type="button" className="sound-toggle" onClick={() => void sound.toggle()} aria-label={l(sound.enabled ? 'Ton ausschalten' : 'Ton einschalten')} aria-pressed={sound.enabled} aria-busy={sound.pending}><SpeakerIcon enabled={sound.enabled} /><span><L>{sound.enabled ? 'TON AN' : 'TON AUS'}</L></span></button>{sound.unavailable && <span className="sound-status" role="status"><L>Ton nicht verfügbar</L></span>}</>;
 
   return (
     <div className="halloween-card" ref={container} data-scene={scene} data-reduced-motion={reducedMotion} data-monster-type={character} onPointerMove={parallax} onPointerLeave={(event) => { event.currentTarget.style.setProperty('--look-x', '0px'); event.currentTarget.style.setProperty('--look-y', '0px'); }}>
-      <CardFrame step={scenes.indexOf(scene)} steps={scenes.map((item) => l(`scene.${item}`))} previewMode={previewMode} controls={controls}>
+      <CardFrame step={scenes.indexOf(scene)} steps={scenes.map((item) => l(sceneNames[item]))} previewMode={previewMode} controls={controls}>
         <div className="halloween-scene" key={scene}>
           {scene === 'intro' && <>
-            <span className="scene-eyebrow" data-scene-copy>{l('intro.eyebrow')}</span>
+            <span className="scene-eyebrow" data-scene-copy><L>DU STEHST AUF DER GÄSTELISTE.</L></span>
             <div className="scene-art scene-art--invitation"><div className="invitation-position"><Invitation /></div></div>
-            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}>Hey {recipientName}<span className="accent">…</span></h2><p>{l('intro.copy1')}{' '}<br />{l('intro.copy2')}</p></div>
-            <button className="primary-button scene-action" onClick={() => { sound.play('ticket'); setScene('door'); }} data-scene-copy>{l('intro.open')} <span aria-hidden="true">→</span></button>
-            <span className="scene-footnote" data-scene-copy>{l('intro.note')}</span>
+            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}>Hey {recipientName}<span className="accent">…</span></h2><p><L>Für dich wurde etwas vorbereitet.</L>{' '}<br /><L>Du musst nur noch die Tür öffnen.</L></p></div>
+            <button className="primary-button scene-action" onClick={() => { sound.play('ticket'); setScene('door'); }} data-scene-copy><L>Überraschung öffnen</L> <span aria-hidden="true">→</span></button>
+            <span className="scene-footnote" data-scene-copy><L>Ein kleiner Schreck. Keine fiesen Schockbilder.</L></span>
           </>}
           {scene === 'door' && <>
-            <span className="scene-eyebrow" data-scene-copy>{l('door.eyebrow')}</span>
-            <button className="door-trigger scene-art" onClick={openDoor} disabled={opening} aria-label={l('door.openAria')}><HauntedDoor /></button>
-            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}>{l('door.title')}</h2><p>{l('door.copy1')}{' '}<br />{l('door.copy2')}</p></div>
-            <button className="primary-button scene-action" onClick={openDoor} disabled={opening} data-scene-copy>{l(opening ? 'door.opening' : 'door.open')} <span aria-hidden="true">→</span></button>
-            <span className="scene-footnote" data-scene-copy>{l('door.note')}</span>
+            <span className="scene-eyebrow" data-scene-copy><L>HAUS NR. 13 / ES IST JEMAND ZU HAUSE.</L></span>
+            <button className="door-trigger scene-art" onClick={openDoor} disabled={opening} aria-label={l('Die geheimnisvolle Tür öffnen')}><HauntedDoor /></button>
+            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}><L>Traust du dich?</L></h2><p><L>Das Licht ist an. Die Tür ist zu.</L>{' '}<br /><L>Einmal klopfen. Dann gibt’s kein Zurück.</L></p></div>
+            <button className="primary-button scene-action" onClick={openDoor} disabled={opening} data-scene-copy><L>{opening ? 'Die Tür öffnet sich…' : 'Anklopfen & öffnen'}</L> <span aria-hidden="true">→</span></button>
+            <span className="scene-footnote" data-scene-copy><L>Am besten mit eingeschaltetem Ton.</L></span>
           </>}
           {scene === 'character' && <>
-            <span className="scene-eyebrow" data-scene-copy>{l('monster.eyebrow')}</span>
-            <div className="scene-art monster-stage"><span className="boo-backdrop" aria-hidden="true">{l('monster.boo')}</span><BatSwarm /><button type="button" className="monster-interaction" onClick={startle} aria-label={l('monster.tap', { params: { character: l(`character.${character}`) } })}><CharacterArt character={character} /></button><span className="monster-tap-hint">{l('monster.hint')}</span></div>
-            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}>{l('monster.title', { params: { name: recipientName } })}</h2><p>{l('monster.copy1')}{' '}<br />{l('monster.copy2')}</p></div>
-            <button className="primary-button scene-action" onClick={() => { sound.play('paper'); setVisibleLetters(0); setScene('message'); }} data-scene-copy>{l('monster.next')} <span aria-hidden="true">→</span></button>
+            <span className="scene-eyebrow" data-scene-copy><L>WIR HABEN DICH ERWARTET.</L></span>
+            <div className="scene-art monster-stage"><span className="boo-backdrop" aria-hidden="true"><L>BUH!</L></span><BatSwarm /><button type="button" className="monster-interaction" onClick={startle} aria-label={l('{character} antippen', { params: { character: l(characterNames[character]) } })}><CharacterArt character={character} /></button><span className="monster-tap-hint"><L>Antippen. Wenn du dich traust.</L></span></div>
+            <div className="scene-copy" data-scene-copy><h2 ref={heading} tabIndex={-1}><L params={{ name: recipientName }}>{'Buh, {name}!'}</L></h2><p><L>Erwischt. Aber das war noch nicht alles.</L>{' '}<br /><L>Jemand hat dir etwas hinterlassen.</L></p></div>
+            <button className="primary-button scene-action" onClick={() => { sound.play('paper'); setVisibleLetters(0); setScene('message'); }} data-scene-copy><L>Deine Nachricht lesen</L> <span aria-hidden="true">→</span></button>
           </>}
           {scene === 'message' && <>
-            <span className="scene-eyebrow" data-scene-copy>{l('message.eyebrow')}</span>
+            <span className="scene-eyebrow" data-scene-copy><L>STRENG GEHEIM / NUR FÜR DEINE AUGEN</L></span>
             <div className="message-scene" data-scene-copy>
-              <h2 ref={heading} tabIndex={-1}>{l('message.title', { params: { name: recipientName } })}</h2>
-              <div className="message-paper"><span className="classified-stamp" aria-hidden="true">{l('message.stamp')}</span><div className="message-flap" aria-hidden="true" /><p className="personal-message"><span className="sr-only">{message}</span><span aria-hidden="true">{reducedMotion ? message : letters.slice(0, visibleLetters).join('')}{typing && <span className="typing-cursor">▌</span>}</span></p><span className="paper-signoff">{l('message.signoff')}</span></div>
-              {typing && <button className="text-button reveal-message" onClick={() => setVisibleLetters(letters.length)}>{l('message.show')}</button>}
+              <h2 ref={heading} tabIndex={-1}><L params={{ name: recipientName }}>{'Für dich, {name}.'}</L></h2>
+              <div className="message-paper"><span className="classified-stamp" aria-hidden="true"><L>ERWISCHT!</L></span><div className="message-flap" aria-hidden="true" /><p className="personal-message"><span className="sr-only">{message}</span><span aria-hidden="true">{reducedMotion ? message : letters.slice(0, visibleLetters).join('')}{typing && <span className="typing-cursor">▌</span>}</span></p><span className="paper-signoff"><L>ZUSTELLUNG DURCH HAUS NR. 13</L></span></div>
+              {typing && <button className="text-button reveal-message" onClick={() => setVisibleLetters(letters.length)}><L>Alles anzeigen</L></button>}
             </div>
-            <button className="primary-button scene-action" onClick={() => { sound.play('finish'); setScene('end'); }} data-scene-copy>{l('message.next')} <span aria-hidden="true">→</span></button>
+            <button className="primary-button scene-action" onClick={() => { sound.play('finish'); setScene('end'); }} data-scene-copy><L>Zum großen Finale</L> <span aria-hidden="true">→</span></button>
           </>}
           {scene === 'end' && <>
             <CandyRain />
-            <span className="scene-eyebrow" data-scene-copy>{l('end.eyebrow')}</span>
+            <span className="scene-eyebrow" data-scene-copy><L>STREICH ERFOLGREICH ZUGESTELLT.</L></span>
             <div className="scene-art scene-art--end"><CharacterArt character={character} /></div>
-            <div className="scene-copy" data-scene-copy><h2 ref={heading} className="end-title" tabIndex={-1}>Happy{' '}<br />Halloween!</h2><p>{l('end.title', { params: { name: recipientName } })}{' '}<br />{l('end.copy')}</p></div>
-            <button className="primary-button scene-action" onClick={replay} data-scene-copy>{l('end.replay')} <span aria-hidden="true">↻</span></button>
-            {!previewMode && <a className="text-button create-card-link" href="/">{l('end.create')}</a>}
+            <div className="scene-copy" data-scene-copy><h2 ref={heading} className="end-title" tabIndex={-1}>Happy{' '}<br />Halloween!</h2><p><L params={{ name: recipientName }}>{'Jetzt bist du dran, {name}.'}</L>{' '}<br /><L>Schnapp dir die Süßigkeiten.</L></p></div>
+            <button className="primary-button scene-action" onClick={replay} data-scene-copy><L>Noch einmal ansehen</L> <span aria-hidden="true">↻</span></button>
+            {!previewMode && <a className="text-button create-card-link" href="/"><L>Auch eine Überraschung erstellen →</L></a>}
           </>}
         </div>
       </CardFrame>

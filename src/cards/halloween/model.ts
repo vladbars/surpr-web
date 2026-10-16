@@ -31,13 +31,13 @@ export function normalizePersonalization(input: Omit<HalloweenSurpriseProps, 'pr
 export function validatePersonalization(input: Omit<HalloweenSurpriseProps, 'previewMode'>) {
   const errors: { recipientName?: string; message?: string; character?: string } = {};
   if (input.recipientName.length < 1 || input.recipientName.length > 40) {
-    errors.recipientName = 'error.name';
+    errors.recipientName = 'Bitte gib einen Namen mit 1 bis 40 Zeichen ein.';
   }
   if (input.message.length < 1 || input.message.length > 300) {
-    errors.message = 'error.message';
+    errors.message = 'Deine Nachricht braucht 1 bis 300 Zeichen.';
   }
   if (!characters.includes(input.character)) {
-    errors.character = 'error.character';
+    errors.character = 'Bitte wähle einen Charakter aus.';
   }
   return errors;
 }

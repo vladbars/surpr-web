@@ -1,77 +1,104 @@
 # surpr web
 
-React + Vite + GSAP; production — статическая сборка под nginx.
-Исходники и npm lockfile берутся из корня монорепозитория.
+Отдельный Git-репозиторий сайта Surpr: React + TypeScript + Vite + GSAP.
+Все команды ниже выполняются из корня **этого репозитория**.
+Локальная папка в общем workspace — `~/surpr/apps/web`.
+
+## Локальный запуск
+
+Node.js 24+, npm:
+
+```bash
+npm ci
+npm run dev
+```
+
+Для телефона в общей сети: `npm run dev -- --host 0.0.0.0`.
+
+```bash
+npm test
+npm run build
+npm run test:e2e
+```
+
+Для E2E нужен Google Chrome. Playwright запускает собственный тестовый сервер.
+Сборка находится в `dist/`.
+
+## Локализация
+
+DE/EN, язык браузера и переключатель в шапке. Переводы загружаются лениво,
+по одному языку. Web использует опубликованный `locon@1.6.1` из npm;
+registry URL и настоящий checksum зафиксированы в `package-lock.json`.
+Локальные архивы, соседний checkout locon и React Native для production-сборки
+не нужны. Для обновления зависимости из корня web:
+
+```bash
+npm install locon@1.6.1 --save-exact --ignore-scripts
+```
+
+Команда обновляет npm integrity в `package-lock.json`. Если npm использует
+устаревшие метаданные реестра, добавить `--prefer-online`.
+Релизный порядок описан в [docs/LOCON_RELEASE.md](docs/LOCON_RELEASE.md).
+
+Язык исходников — немецкий (`projectLocale: 'de'`), fallback для неподдерживаемых
+языков браузера — английский (`defaultLocale: 'en'`). В коде пишем
+`<L>Überraschung öffnen</L>`, `<L params={{ name }}>{'Buh, {name}!'}</L>`;
+`l()` остаётся для строковых атрибутов и metadata, например `placeholder={l('Name eingeben')}`.
+Технические ключи для перевода не используем. JSON содержит исходную немецкую
+фразу и соответствующий перевод, поэтому первый визит на EN не требует загрузки
+немецкого ресурса. Длинные правовые тексты на немецком находятся в
+`src/legal/content.ts` и переводятся таким же способом.
+
+Проверка фраз, паритета DE/EN, параметров и дубликатов: `npm run i18n:check`.
 
 ## Docker
 
-После публикации `locon@1.6.0` в npm и обновления lockfile, из корня Surpr:
+Из корня репозитория web:
 
 ```bash
-docker build -f apps/web/Dockerfile -t surpr-web:local .
+docker build -t surpr-web:local .
 docker run --rm -p 127.0.0.1:8081:8080 surpr-web:local
 ```
 
-Сайт: `http://127.0.0.1:8081`. Node.js используется только при сборке;
-готовый контейнер содержит nginx и `dist`, работает без root на порту 8080.
-Healthcheck: `GET /healthz` → `200 ok`.
-
-Альтернатива — `apps/web/compose.yaml`; он подходит для Coolify и не публикует
-порт на хост. Включены read-only FS, tmpfs для временных файлов nginx,
-удаление capabilities и запрет повышения привилегий.
+Node.js используется при сборке. Runtime — nginx без root на порту 8080.
+Healthcheck: `GET /healthz` → `200 ok`. `compose.yaml` использует текущую
+папку как build context, read-only FS, tmpfs и не публикует порт на хост.
 
 ## Coolify
 
-Создать отдельное приложение web в том же репозитории:
+Создать приложение из отдельного Git-репозитория web:
 
 | Параметр | Значение |
 | --- | --- |
 | Build Pack | Dockerfile |
-| Base Directory / build context | `/` — корень монорепозитория |
-| Dockerfile Location | `/apps/web/Dockerfile` |
+| Base Directory / build context | `/` — корень репозитория web |
+| Dockerfile Location | `/Dockerfile` |
 | Port | `8080` |
 | Healthcheck path | `/healthz` |
 | Domain | `https://surpr.link` |
 
-API разворачивается отдельным приложением через `/apps/api/Dockerfile`,
-с доменом `https://api.surpr.link`. TLS завершает proxy Coolify.
-Ни MongoDB URI, ни OpenAI/Gumroad credentials в web не передаются.
-Текущему локальному демо не нужны build/runtime environment variables.
-Если позже появятся `VITE_*` настройки, они будут публичными и потребуют
-передачи на этапе сборки, а не изменения runtime env nginx.
+API разворачивается из своего Git-репозитория отдельным приложением,
+с доменом `https://api.surpr.link`. MongoDB URI и серверные ключи в web
+не передаются. Для текущего демо build/runtime env не нужны. Будущие
+`VITE_*` настройки публичны и применяются во время сборки.
 
-## Раздача и маршруты
+## Маршруты и данные
 
-- `index.html` и маршруты SPA: `no-cache`, чтобы браузер перепроверял HTML
-  после обновления; `/c/:slug` получает SPA shell при прямом открытии.
-- `/assets/*`: годовой immutable cache для хешированных файлов Vite.
-- Отсутствующие JS/CSS, переводы и аудио возвращают 404, а не HTML.
-- `/api/*` не перенаправляется в SPA; маршруты API обслуживает отдельный сервис.
-- Отдаётся `noindex, nofollow`, как и в текущем HTML демо.
-- Access logs содержат request ID, метод и статус, без полных URL/query/IP.
+- `index.html` и SPA-маршруты: `no-cache`.
+- Хешированные `/assets/*`: immutable cache на год.
+- Отсутствующие ресурсы и `/api/*`: 404; API обслуживает отдельный домен.
+- `noindex, nofollow`, `no-referrer`; access logs без полных URL/query/IP.
+- SPA fallback доставляет HTML, но не включает публикацию или checkout.
 
-SPA fallback только доставляет HTML: загрузка опубликованной карточки по slug
-и checkout/Gumroad пока не реализованы. Docker сам по себе не включает эти функции.
+Демо: Intro → Door → Character → Message → End, три персонажа, звук после
+первого взаимодействия, повтор и поддержка reduced motion. Персональный
+текст остаётся в памяти браузерной страницы. Текущий web не вызывает API.
 
-Правовые страницы демо: `/impressum`, `/privacy`, `/terms`, `/support`, `/delete`
-на DE/EN. Реквизиты взяты с vlad.mobi; хостинг — Hetzner, Германия.
-Тексты описывают локальное демо, без продаж и серверного хранения карточек.
-На `/delete` можно удалить сохранённые язык и настройку звука.
-Источники и необходимые обновления перед продажами: [07_LEGAL.md](../../docs/07_LEGAL.md).
+Правовые страницы на DE/EN: `/impressum`, `/privacy`, `/terms`, `/support`,
+`/delete`. Реквизиты — vlad.mobi; хостинг — Hetzner, Германия.
+На `/delete` можно сбросить сохранённые язык и звук.
+Источники и обновления перед продажами: [docs/LEGAL.md](docs/LEGAL.md).
 
-## Предварительное условие locon
-
-`locon` устанавливается исключительно из npm как `1.6.0`.
-Пока версия не опубликована, полная web Docker-сборка остановится на `npm ci`
-с 404. Локальные tarball и соседняя папка не используются.
-После успешного Release workflow locon из корня Surpr выполнить:
-
-```bash
-npm install --workspace @surpr/web locon@1.6.0 --save-exact --ignore-scripts
-```
-
-Сохранить обновлённый `package-lock.json` вместе с исходниками перед сборкой.
-
-Основа: [NGINX unprivileged](https://github.com/nginx/docker-nginx-unprivileged),
+Справочники: [NGINX unprivileged](https://github.com/nginx/docker-nginx-unprivileged),
 [nginx try_files](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files),
 [Docker multi-stage builds](https://docs.docker.com/build/building/multi-stage/).

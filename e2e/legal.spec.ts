@@ -13,7 +13,7 @@ test('legal pages are reachable, localized, and readable on direct visits', asyn
   await expect(page).toHaveTitle('Imprint — surpr.');
   for (const [label, path, heading] of [
     ['Privacy', '/privacy', 'Privacy policy'],
-    ['Terms', '/terms', 'Terms of use'],
+    ['Terms of use', '/terms', 'Terms of use'],
     ['Support', '/support', 'Need a hand?'],
     ['Delete data', '/delete', 'Your data. Your choice.'],
   ]) {

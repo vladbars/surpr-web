@@ -1,0 +1,13 @@
+.git
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/*.log
+**/test-results
+**/playwright-report
+**/coverage
+artifacts
+.DS_Store
+.codex
+.agents

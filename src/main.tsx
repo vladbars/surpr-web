@@ -10,7 +10,7 @@ async function start() {
   const i18n = createWebI18n();
   await i18n.setLocale(i18n.getSnapshot().currentLocale);
   document.documentElement.lang = i18n.getSnapshot().currentLocale;
-  document.title = i18n.l('document.title');
+  document.title = i18n.l('surpr. — Dein Halloween-Streich');
   root.render(<StrictMode><LoconProvider instance={i18n}><Site /></LoconProvider></StrictMode>);
 }
 function retry() {

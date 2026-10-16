@@ -1,14 +1,14 @@
 import { useLayoutEffect } from 'react';
-import { useLocon } from 'locon/react';
+import { L, useLocon } from 'locon/react';
 import { localeStorageKey } from './index';
 
-export function LanguageSwitcher({ titleKey, descriptionKey = 'document.description' }: { titleKey?: string; descriptionKey?: string }) {
+export function LanguageSwitcher({ title, description = 'Kleiner Link. Große Reaktion. Öffne die Tür zu deinem interaktiven Halloween-Surpr.' }: { title?: string; description?: string }) {
   const { currentLocale, locales, l, setLocale, loading, error } = useLocon();
   useLayoutEffect(() => {
     document.documentElement.lang = currentLocale;
-    document.title = titleKey ? `${l(titleKey)} — surpr.` : l('document.title');
-    document.querySelector('meta[name="description"]')?.setAttribute('content', l(descriptionKey));
-  }, [currentLocale, l, titleKey, descriptionKey]);
+    document.title = title ? `${l(title)} — surpr.` : l('surpr. — Dein Halloween-Streich');
+    document.querySelector('meta[name="description"]')?.setAttribute('content', l(description));
+  }, [currentLocale, l, title, description]);
   async function choose(locale: string) {
     try {
       if (await setLocale(locale)) {
@@ -17,9 +17,9 @@ export function LanguageSwitcher({ titleKey, descriptionKey = 'document.descript
     } catch { /* The store exposes the error and retains the previous language. */ }
   }
   return <div className="language-control">
-    <div className="language-switcher" role="group" aria-label={l('locale.label')} aria-busy={loading}>
+    <div className="language-switcher" role="group" aria-label={l('Sprache')} aria-busy={loading}>
       {locales.map((locale) => <button type="button" key={locale} lang={locale} aria-label={locale === 'de' ? 'Deutsch' : 'English'} aria-pressed={currentLocale === locale} onClick={() => void choose(locale)}>{locale.toUpperCase()}</button>)}
     </div>
-    {error && <span className="locale-error" role="alert">{l('locale.error')}</span>}
+    {error && <span className="locale-error" role="alert"><L>Sprache konnte nicht geladen werden. Bitte erneut versuchen.</L></span>}
   </div>;
 }

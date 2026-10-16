@@ -1,4 +1,4 @@
-import { useLocon } from 'locon/react';
+import { L, useLocon } from 'locon/react';
 import type { ReactNode } from 'react';
 import './card-frame.css';
 
@@ -17,12 +17,12 @@ export function CardFrame({ step, steps, previewMode, children, controls }: Card
     <div className="card-frame">
       <header className="card-topline">
         <span className="wordmark wordmark--small">surpr<span>.</span></span>
-        <div className="card-controls"><span className="card-edition">{l(previewMode ? 'card.preview' : 'card.forYou')}</span>{controls}</div>
+        <div className="card-controls"><span className="card-edition"><L>{previewMode ? 'VORSCHAU' : 'FÜR DICH'}</L></span>{controls}</div>
       </header>
       {children}
       <footer className="card-bottomline">
         <span className="scene-counter">0{step + 1} / 0{steps.length}</span>
-        <ol className="scene-progress" aria-label={l('card.progress')}>
+        <ol className="scene-progress" aria-label={l('Fortschritt')}>
           {steps.map((label, index) => (
             <li key={label} aria-label={`${index + 1}. ${label}`} aria-current={step === index ? 'step' : undefined} className={index <= step ? 'is-complete' : undefined} />
           ))}

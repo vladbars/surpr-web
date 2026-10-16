@@ -1,16 +1,16 @@
-import { useLocon } from 'locon/react';
+import { L, useLocon } from 'locon/react';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { HalloweenSurprise } from './cards/halloween/HalloweenSurprise';
 import { CharacterArt, Bat } from './cards/halloween/Artwork';
-import { characters, defaultPersonalization, normalizePersonalization, validatePersonalization } from './cards/halloween/model';
+import { characters, characterNames, defaultPersonalization, normalizePersonalization, validatePersonalization } from './cards/halloween/model';
 import { SiteFooter, SiteHeader } from './SiteChrome';
 import { useReducedMotion } from './hooks/useReducedMotion';
 
 export function App() {
   const { l } = useLocon();
-  const [form, setForm] = useState(() => ({ ...defaultPersonalization, message: l('sample.message') }));
-  const [personalization, setPersonalization] = useState(() => ({ ...defaultPersonalization, message: l('sample.message') }));
+  const [form, setForm] = useState(() => ({ ...defaultPersonalization, message: l(defaultPersonalization.message) }));
+  const [personalization, setPersonalization] = useState(() => ({ ...defaultPersonalization, message: l(defaultPersonalization.message) }));
   const [errors, setErrors] = useState<ReturnType<typeof validatePersonalization>>({});
   const [revision, setRevision] = useState(0);
   const preview = useRef<HTMLDivElement>(null);
@@ -37,42 +37,42 @@ export function App() {
       <main>
         <section className="page-intro" aria-labelledby="demo-heading">
           <div>
-            <p className="edition-label">{l('site.edition')}</p>
-            <h1 id="demo-heading">{l('site.headline')}{' '}<br /><span>Surpr.</span><Bat className="headline-bat" /></h1>
+            <p className="edition-label"><L>31.10.2026 / DIE ERSTE EDITION</L></p>
+            <h1 id="demo-heading"><L>Süßes. Saures.</L>{' '}<br /><span>Surpr.</span><Bat className="headline-bat" /></h1>
           </div>
-          <div className="intro-description"><p>{l('site.description1')}{' '}<br />{l('site.description2')}</p><a href="#experience">{l('site.try')} <span aria-hidden="true">↓</span></a></div>
+          <div className="intro-description"><p><L>Ein Halloween-Streich zum Verschicken.</L>{' '}<br /><L>Mit Ton, Monstern und deiner Nachricht.</L></p><a href="#experience"><L>Probier’s selbst</L> <span aria-hidden="true">↓</span></a></div>
         </section>
 
         <div className="demo-layout">
-          <section className="preview-section" aria-label={l('site.previewAria')} id="experience" ref={preview}>
-            <div className="preview-caption"><span>{l('site.previewTitle')}</span><span>{l('site.previewScenes')}</span></div>
+          <section className="preview-section" aria-label={l('Interaktive Halloween-Vorschau')} id="experience" ref={preview}>
+            <div className="preview-caption"><span><L>DER KLEINE HORRORTRIP</L></span><span><L>5 SZENEN / DU BIST DRAN</L></span></div>
             <HalloweenSurprise key={revision} {...personalization} previewMode />
-            <p className="preview-underneath">{l('site.steps')} <span>{l('site.soundHint')}</span></p>
+            <p className="preview-underneath"><L>Klopfen. Tür öffnen. Erwischt werden.</L> <span><L>Mit Ton wird’s besser.</L></span></p>
           </section>
 
           <aside className="editor-panel" aria-labelledby="editor-heading">
-            <div className="editor-heading"><span className="editor-number">01—03</span><h2 id="editor-heading">{l('editor.title1')}{' '}<br />{l('editor.title2')}</h2><p>{l('editor.description')}</p></div>
-            <form className="demo-form" onSubmit={updatePreview} noValidate aria-label={l('editor.formAria')}>
-              <div className="field-label"><label htmlFor="recipient-name">{l('editor.name')}</label><span>{form.recipientName.length}/40</span></div>
-              <input id="recipient-name" autoComplete="off" maxLength={40} value={form.recipientName} onChange={(event) => setForm({ ...form, recipientName: event.target.value })} aria-invalid={Boolean(errors.recipientName)} aria-describedby={errors.recipientName ? 'name-error' : undefined} placeholder={l('editor.namePlaceholder')} required />
-              {errors.recipientName && <p className="field-error" id="name-error" role="alert">{l(errors.recipientName)}</p>}
+            <div className="editor-heading"><span className="editor-number">01—03</span><h2 id="editor-heading"><L>Dein Streich.</L>{' '}<br /><L>Deine Leute.</L></h2><p><L>Wer bekommt heute einen kleinen Schreck?</L></p></div>
+            <form className="demo-form" onSubmit={updatePreview} noValidate aria-label={l('Deine Demo personalisieren')}>
+              <div className="field-label"><label htmlFor="recipient-name"><L>01 / Für wen?</L></label><span>{form.recipientName.length}/40</span></div>
+              <input id="recipient-name" autoComplete="off" maxLength={40} value={form.recipientName} onChange={(event) => setForm({ ...form, recipientName: event.target.value })} aria-invalid={Boolean(errors.recipientName)} aria-describedby={errors.recipientName ? 'name-error' : undefined} placeholder={l('Name eingeben')} required />
+              {errors.recipientName && <p className="field-error" id="name-error" role="alert"><L>{errors.recipientName}</L></p>}
 
               <fieldset className="character-picker">
-                <legend>{l('editor.character')}</legend>
+                <legend><L>02 / Wer lauert hinter der Tür?</L></legend>
                 <div className="character-options">{characters.map((character) => (
                   <label className={`character-option ${form.character === character ? 'is-selected' : ''}`} key={character}>
                     <input type="radio" name="character" value={character} checked={form.character === character} onChange={() => setForm({ ...form, character })} />
                     <CharacterArt character={character} small />
-                    <span>{l(`character.${character}`)}</span><span className="selection-dot" aria-hidden="true" />
+                    <span><L>{characterNames[character]}</L></span><span className="selection-dot" aria-hidden="true" />
                   </label>
                 ))}</div>
               </fieldset>
 
-              <div className="field-label"><label htmlFor="card-message">{l('editor.message')}</label><span>{form.message.length}/300</span></div>
+              <div className="field-label"><label htmlFor="card-message"><L>03 / Deine geheime Nachricht</L></label><span>{form.message.length}/300</span></div>
               <textarea id="card-message" maxLength={300} rows={4} value={form.message} onChange={(event) => setForm({ ...form, message: event.target.value })} aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'message-error' : undefined} required />
-              {errors.message && <p className="field-error" id="message-error" role="alert">{l(errors.message)}</p>}
-              <button className="preview-button" type="submit">{l('editor.preview')} <span aria-hidden="true">↗</span></button>
-              <p className="demo-note">{l('editor.demo1')}{' '}<br />{l('editor.demo2')}</p>
+              {errors.message && <p className="field-error" id="message-error" role="alert"><L>{errors.message}</L></p>}
+              <button className="preview-button" type="submit"><L>Vorschau ansehen</L> <span aria-hidden="true">↗</span></button>
+              <p className="demo-note"><L>Kostenlose Demo. Noch keine Veröffentlichung.</L>{' '}<br /><L>Deine Eingaben bleiben in diesem Browserfenster.</L></p>
             </form>
           </aside>
         </div>

@@ -5,7 +5,7 @@ export function createWebI18n() {
   let saved: string | null = null;
   try { saved = localStorage.getItem(localeStorageKey); } catch { /* Storage is optional. */ }
   return createLocon({
-    defaultLocale: 'en', locale: saved === 'de' || saved === 'en' ? saved : null,
+    defaultLocale: 'en', projectLocale: 'de', locale: saved === 'de' || saved === 'en' ? saved : null,
     languages: navigator.languages?.length ? navigator.languages : [navigator.language],
     loaders: { de: () => import('./locales/de.json'), en: () => import('./locales/en.json') },
   });
